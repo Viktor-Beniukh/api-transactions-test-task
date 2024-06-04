@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "api-transactions-test-task"
+version = "0.1.0"
+description = "API service for transaction management"
+authors = ["Viktor Beniukh <superbigbenjamin@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
