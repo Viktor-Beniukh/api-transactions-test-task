@@ -5,7 +5,12 @@ from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from fastapi_pagination.utils import disable_installed_extensions_check
 
+from src.core.conf.config import settings
 from src.core.conf.logging_config import setup_logging
+
+from src.routes.admin import router as admin_router
+from src.routes import router as router_v1
+
 
 setup_logging()
 
@@ -15,6 +20,9 @@ disable_installed_extensions_check()
 
 
 app = FastAPI(title="Transaction API", description="The management of the Transaction API")
+
+app.include_router(router=admin_router, prefix="/api")
+app.include_router(router=router_v1, prefix=settings.api_v1_prefix)
 
 
 add_pagination(app)
