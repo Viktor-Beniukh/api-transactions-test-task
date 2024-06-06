@@ -10,7 +10,7 @@ from src.core.database.db_settings.db_helper import db_dependency
 
 from src.repositories import admin as repository_admin
 from src.schemas.admin import AdminResponse, AdminRegister, AdminMessageResponse
-
+from src.services.auth_dependencies import get_current_admin
 
 from src.services.security import verify_password
 
@@ -86,7 +86,7 @@ async def login_admin(
     return {"token": token}
 
 
-@router.post("/logout", response_model=AdminMessageResponse)
+@router.post("/logout", response_model=AdminMessageResponse, dependencies=[Depends(get_current_admin)])
 async def logout_admin(session: db_dependency) -> dict[str, str]:
     """
     The logout_admin function is used to log out an admin user.
@@ -104,7 +104,7 @@ async def logout_admin(session: db_dependency) -> dict[str, str]:
     return {"message": "Successfully logged out"}
 
 
-@router.get("/admin_panel", response_class=HTMLResponse)
+@router.get("/admin_panel", response_class=HTMLResponse, dependencies=[Depends(get_current_admin)])
 async def admin_panel(request: Request):
     data = {"message": "Welcome to the Admin Panel!"}
     return templates.TemplateResponse("admin_panel.html", {"request": request, "data": data})

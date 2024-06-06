@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Depends
 
 from src.core.database import models
 from src.core.database.db_settings.db_helper import db_dependency
@@ -13,13 +13,15 @@ from src.schemas.transactions import (
     TransactionCreate,
 )
 from src.schemas.users import UserResponse, UserCreate, UserUpdate
+from src.services.auth_dependencies import get_current_admin
 
 router = APIRouter(tags=["Users"])
 
 
 @router.post("/",
              response_model=UserResponse,
-             status_code=status.HTTP_201_CREATED)
+             status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(get_current_admin)])
 async def create_user(user_data: UserCreate, session: db_dependency) -> models.User:
     """
     The create_user function creates a new user in the database.
@@ -43,7 +45,7 @@ async def create_user(user_data: UserCreate, session: db_dependency) -> models.U
     return await repository_users.create_user(user=user_data, session=session)
 
 
-@router.get("/", response_model=list[UserResponse])
+@router.get("/", response_model=list[UserResponse], dependencies=[Depends(get_current_admin)])
 async def get_all_users(session: db_dependency) -> list[models.User]:
     """
     The function returns a list of all users in the database.
@@ -63,7 +65,9 @@ async def get_all_users(session: db_dependency) -> list[models.User]:
     return users
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}",
+            response_model=UserResponse,
+            dependencies=[Depends(get_current_admin)])
 async def get_single_user(user_id: int, session: db_dependency) -> models.User:
     """
     The function returns the single user data in the database.
@@ -84,7 +88,9 @@ async def get_single_user(user_id: int, session: db_dependency) -> models.User:
     return user
 
 
-@router.put("/{user_id}/update", response_model=UserResponse)
+@router.put("/{user_id}/update",
+            response_model=UserResponse,
+            dependencies=[Depends(get_current_admin)])
 async def update_user(updated_user: UserUpdate, user_id: int, session: db_dependency) -> models.User:
     """
     The update_user function is used to update the user.
@@ -110,7 +116,9 @@ async def update_user(updated_user: UserUpdate, user_id: int, session: db_depend
     return updated_user_data
 
 
-@router.delete("/{user_id}/delete", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}/delete",
+               status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(get_current_admin)])
 async def delete_user(user_id: int, session: db_dependency) -> None:
     """
     The delete_user function is used to delete the user.
@@ -139,7 +147,8 @@ async def delete_user(user_id: int, session: db_dependency) -> None:
 
 @router.post("/{user_id}/transactions/create",
              response_model=TransactionResponse,
-             status_code=status.HTTP_201_CREATED)
+             status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(get_current_admin)])
 async def add_transaction_for_user(
     transaction_data: TransactionCreate,
     user_id: int,
@@ -162,7 +171,8 @@ async def add_transaction_for_user(
 
 
 @router.patch("/{user_id}/transactions/{transaction_id}/partial_update",
-              response_model=TransactionMessageResponse)
+              response_model=TransactionMessageResponse,
+              dependencies=[Depends(get_current_admin)])
 async def partial_update_transaction(
     updated_transaction: TransactionPartialUpdate,
     user_id: int,
@@ -193,7 +203,9 @@ async def partial_update_transaction(
     return {"message": "The transaction updated successfully!"}
 
 
-@router.delete("/{user_id}/transactions/{transaction_id}/delete", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}/transactions/{transaction_id}/delete",
+               status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(get_current_admin)])
 async def delete_transaction(user_id: int, transaction_id: int, session: db_dependency) -> None:
     """
     The delete_transaction function is used to delete the transaction.
