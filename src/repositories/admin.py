@@ -77,7 +77,14 @@ async def login_admin(username: str, password: str, session: AsyncSession) -> st
     return token
 
 
-async def logout_admin(session: AsyncSession):
-    await session.execute(delete(models.AdminToken))
+# async def logout_admin(session: AsyncSession):
+#     await session.execute(delete(models.AdminToken))
+#
+#     await session.commit()
+#
 
+async def logout_admin(token: str, session: AsyncSession):
+    await session.execute(
+        delete(models.AdminToken).where(models.AdminToken.token == token)
+    )
     await session.commit()

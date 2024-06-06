@@ -4,6 +4,7 @@ import logging
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from fastapi_pagination.utils import disable_installed_extensions_check
+from fastapi.staticfiles import StaticFiles
 
 from src.core.conf.config import settings
 from src.core.conf.logging_config import setup_logging
@@ -20,6 +21,8 @@ disable_installed_extensions_check()
 
 
 app = FastAPI(title="Transaction API", description="The management of the Transaction API")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(router=admin_router, prefix="/api")
 app.include_router(router=router_v1, prefix=settings.api_v1_prefix)
