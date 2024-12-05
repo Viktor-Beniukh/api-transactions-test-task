@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Register{% endblock %}
+
+{% block content %}
+
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+        <div class="card custom-shadow no-border" style="width: 100%; max-width: 400px;">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Admin Register</h2>
+                <form id="registration-form" method="post" onsubmit="return submitForm(event)">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  <script>
+    async function submitForm(event) {
+        event.preventDefault();
+        const form = document.getElementById('registration-form');
+        const formData = new FormData(form);
+        const requestData = {
+          username: formData.get('username'),
+          password: formData.get('password')
+        };
+
+        const response = await fetch('/api/admin/admin-register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            alert(responseData.message);
+            window.location.href = '/api/admin/admin-login'; // Redirect to login page
+        } else {
+          const errorData = await response.json();
+          if (errorData.detail && errorData.detail.includes("Admin already exists")) {
+              alert("Administrator already exists."); // Show error message
+          } else {
+              console.error('Admin registration failed:', errorData);
+              // Handle other error cases
+          }
+        }
+    }
+  </script>
+
+{% endblock %}
